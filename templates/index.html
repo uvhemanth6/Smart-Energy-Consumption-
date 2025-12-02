@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Energy Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="background-mesh"></div>
+
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme">
+        <span class="icon">🌙</span>
+    </button>
+
+    <div class="dashboard-container">
+        <!-- LEFT PANEL: CONTROL CENTER (Logo + Form) -->
+        <aside class="control-panel">
+            <div class="brand-header">
+                <div class="logo-icon-small">
+                    <span class="bolt">⚡</span>
+                </div>
+                <h2>Smart Energy <span class="highlight">Control</span></h2>
+            </div>
+
+            <div class="scroll-area">
+                <form id="predictionForm">
+                    <!-- Weather Section -->
+                    <div class="panel-card">
+                        <div class="card-header">
+                            <span class="icon">🌤️</span>
+                            <h3>Weather Conditions</h3>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Air Temp (°C)</label>
+                                <input type="number" step="0.1" name="air_temperature" value="25.0" required>
+                            </div>
+                            <div class="field">
+                                <label>Dew Point (°C)</label>
+                                <input type="number" step="0.1" name="dew_point_temperature" value="15.0" required>
+                            </div>
+                            <div class="field">
+                                <label>Humidity (%)</label>
+                                <input type="number" step="0.1" name="relative_humidity" value="60.0" required>
+                            </div>
+                            <div class="field">
+                                <label>Wind Speed (m/s)</label>
+                                <input type="number" step="0.1" name="wind_speed" value="3.5" required>
+                            </div>
+                            <div class="field full-width">
+                                <label>Wind Direction: <span id="windValue">180</span>°</label>
+                                <input type="range" min="0" max="360" value="180" name="wind_direction"
+                                    oninput="document.getElementById('windValue').textContent = this.value">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Section -->
+                    <div class="panel-card">
+                        <div class="card-header">
+                            <span class="icon">📊</span>
+                            <h3>Historical Data</h3>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field full-width">
+                                <label>Timestamp</label>
+                                <input type="datetime-local" name="timestamp" required>
+                            </div>
+                            <div class="field">
+                                <label>1h Ago (kWh)</label>
+                                <input type="number" step="0.1" name="lag_1h" placeholder="2.5" required>
+                            </div>
+                            <div class="field">
+                                <label>24h Ago (kWh)</label>
+                                <input type="number" step="0.1" name="lag_24h" placeholder="2.6" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="predictBtn" class="cta-button">
+                        <span class="btn-content">
+                            <span class="icon">🚀</span> Run Analysis
+                        </span>
+                        <div class="loader"></div>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL: ANALYTICS HUB (Output + Graph) -->
+        <main class="analytics-panel">
+            <div class="dashboard-header">
+                <h1>Live <span class="highlight">Analytics</span></h1>
+                <div class="live-indicator">
+                    <span class="dot"></span> System Ready
+                </div>
+            </div>
+
+            <!-- Main Result Display -->
+            <div class="main-metric-card" id="mainResult">
+                <div class="metric-circle">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="0, 100"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="metric-value">
+                        <span id="predValue">--</span>
+                        <small>kWh</small>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <span id="statusBadge" class="badge">Waiting</span>
+                    <p id="statusMessage">Enter data and run analysis to see predictions.</p>
+                </div>
+            </div>
+
+            <!-- Charts Area -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>
+                        Consumption Trend
+                        <span style="font-size: 0.8rem; opacity: 0.7;">Last 4 Hours</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Efficiency Score</h3>
+                    <div class="efficiency-bar">
+                        <div class="bar-fill" style="width: 0%"></div>
+                    </div>
+                    <p class="efficiency-text">--%</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
